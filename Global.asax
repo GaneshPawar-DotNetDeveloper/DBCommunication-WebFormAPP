@@ -1,1 +1,1 @@
-﻿<%@ Application Codebehind="Global.asax.cs" Inherits="CRUDUsingADO.NET.Global" Language="C#" %>
+﻿<%@ Application Codebehind="Global.asax.cs" Inherits="DataBaseCommunication.Global" Language="C#" %>
