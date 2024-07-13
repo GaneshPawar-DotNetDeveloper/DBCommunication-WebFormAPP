@@ -1,0 +1,110 @@
+# Communication Between two Database by C#
+
+# Backup data from one database to other
+
+# Database ADONETB15
+
+CREATE TABLE [dbo].[student](
+	[RollNumber] [int] IDENTITY(1,1) NOT NULL,
+	[Name] [varchar](50) NULL,
+	[Email] [varchar](50) NULL,
+	[DOB] [date] NULL,
+PRIMARY KEY CLUSTERED 
+(
+	[RollNumber] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
+) ON [PRIMARY]
+
+# Database ADONET15_Backup
+
+CREATE TABLE [dbo].[student](
+	[RollNumber] [int] IDENTITY(1,1) NOT NULL,
+	[Name] [varchar](50) NULL,
+	[Email] [varchar](50) NULL,
+	[DOB] [date] NULL,
+PRIMARY KEY CLUSTERED 
+(
+	[RollNumber] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
+) ON [PRIMARY]
+
+# .aspx file
+
+<%@ Page Language="C#" AutoEventWireup="true" CodeBehind="BackupData.aspx.cs" Inherits="ADONET15_Backup.BackupData" %>
+
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head runat="server">
+    <title></title>
+</head>
+<body>
+    <form id="form1" runat="server">
+       <asp:Button runat="server" Text="Backup" OnClick="Unnamed_Click" ></asp:Button> 
+    </form>
+</body>
+</html>
+
+# .aspx.cs
+
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Web;
+using System.Web.UI;
+using System.Web.UI.WebControls;
+using System.Data.SqlClient;
+using System.Configuration;
+
+namespace ADONET15_Backup
+{
+    public partial class BackupData : System.Web.UI.Page
+    {
+        protected void Page_Load(object sender, EventArgs e)
+        {
+
+        }
+
+        protected void Unnamed_Click(object sender, EventArgs e)
+        {
+            string cs = ConfigurationManager.ConnectionStrings["ADONET15"].ConnectionString;
+            SqlConnection con = new SqlConnection(cs);
+            string csb = ConfigurationManager.ConnectionStrings["ADONET15_Backup"].ConnectionString;
+            SqlConnection conb = new SqlConnection(csb);
+            SqlCommand com = new SqlCommand("select * from student", con);
+            con.Open();
+            conb.Open();
+            SqlDataReader reader = com.ExecuteReader();
+            SqlBulkCopy bulkCopy = new SqlBulkCopy(conb);
+            bulkCopy.DestinationTableName = "dbo.student";
+            bulkCopy.WriteToServer(reader);
+            con.Close();
+            conb.Close();
+        }
+    }
+}
+
+# .config file
+
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  For more information on how to configure your ASP.NET application, please visit
+  https://go.microsoft.com/fwlink/?LinkId=169433
+  -->
+<configuration>
+  <system.web>
+    <compilation debug="true" targetFramework="4.7.2" />
+    <httpRuntime targetFramework="4.7.2" />
+  </system.web>
+	<connectionStrings>
+		<add name="ADONET15" connectionString="server=.;database=ADONETB15;integrated security=true;"/>
+
+		<add name="ADONET15_Backup" connectionString="server=.;database=ADONET15_Backup;integrated security=true;"/>
+	</connectionStrings>
+  <system.codedom>
+    <compilers>
+      <compiler language="c#;cs;csharp" extension=".cs" type="Microsoft.CodeDom.Providers.DotNetCompilerPlatform.CSharpCodeProvider, Microsoft.CodeDom.Providers.DotNetCompilerPlatform, Version=2.0.1.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35" warningLevel="4" compilerOptions="/langversion:default /nowarn:1659;1699;1701" />
+      <compiler language="vb;vbs;visualbasic;vbscript" extension=".vb" type="Microsoft.CodeDom.Providers.DotNetCompilerPlatform.VBCodeProvider, Microsoft.CodeDom.Providers.DotNetCompilerPlatform, Version=2.0.1.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35" warningLevel="4" compilerOptions="/langversion:default /nowarn:41008 /define:_MYTYPE=\&quot;Web\&quot; /optionInfer+" />
+    </compilers>
+  </system.codedom>
+</configuration>
